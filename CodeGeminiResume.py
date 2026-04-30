@@ -13,7 +13,9 @@ def generate_and_upload_blog(target_url="https://rs-bhayangkarasurabaya.id/"):
     dan langsung mengunggahnya ke Blogger.
     """
     api_key = os.getenv("api_key")
+    print("api_key: ", api_key)
     blog_id = os.getenv("blog_id")
+    print("blog_id: ", blog_id)
     
     if not api_key or not blog_id:
         return {"status": "error", "message": "API Key atau Blog ID tidak ditemukan di .env"}
@@ -68,4 +70,4 @@ def generate_and_upload_blog(target_url="https://rs-bhayangkarasurabaya.id/"):
         return {"status": "error", "message": error_msg}
 
 if __name__ == "__main__":
-    generate_and_upload_blog()
+    generate_and_upload_blog("https://rs-bhayangkarasurabaya.id/")
