@@ -4,7 +4,7 @@ from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 
-BLOG_ID = '121149020945595556' 
+BLOG_ID = '3613093306617339175' 
 SCOPES = ['https://www.googleapis.com/auth/blogger']
 
 def get_blogger_service():

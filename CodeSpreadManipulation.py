@@ -5,7 +5,7 @@ from CodeGeminiResume import generate_and_upload_blog
 import time
 
 gc = gspread.service_account(filename='credentials-spread.json')
-sh = gc.open_by_key("1RQEM7-IUGBdVu1aImZt_rg-CnM8iulCq3TMKrEL7Lt4")
+sh = gc.open_by_key("102jENB2-gOpjMN5Y52UMw7NeVXJAl5vkXDLcGWYc7kw")
 
 worksheet = sh.sheet1
 
