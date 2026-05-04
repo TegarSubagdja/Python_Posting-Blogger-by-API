@@ -33,10 +33,11 @@ def buat_postingan(body):
         request = service.posts().insert(blogId=BLOG_ID, body=body, isDraft=True)
         response = request.execute()
 
-        if response == 200:
+        if response['published']:
             return {"status": "success", "message": response}
         else:
             return {"status": "error", "message": response}
 
     except Exception as e:
+        print({"status": "error", "message": str(e)})
         return {"status": "error", "message": str(e)}

@@ -13,9 +13,7 @@ def generate_and_upload_blog(target_url="https://rs-bhayangkarasurabaya.id/"):
     dan langsung mengunggahnya ke Blogger.
     """
     api_key = os.getenv("api_key")
-    print("api_key: ", api_key)
     blog_id = os.getenv("blog_id")
-    print("blog_id: ", blog_id)
     
     if not api_key or not blog_id:
         return {"status": "error", "message": "API Key atau Blog ID tidak ditemukan di .env"}
@@ -56,9 +54,11 @@ def generate_and_upload_blog(target_url="https://rs-bhayangkarasurabaya.id/"):
         data = json.loads(response.text)
         
         hasil_upload = buat_postingan(data)
-        
-        print(f"Berhasil: {data.get('title')}")
-        return {"status": "success", "data": data, "upload_response": hasil_upload}
+
+        if hasil_upload["status"] == "success":
+            return {"status": "success", "data": data, "upload_response": hasil_upload}
+        else:
+            return {"status": "error", "data": data, "upload_response": hasil_upload}
 
     except json.JSONDecodeError as je:
         error_msg = f"Gagal parsing JSON. Raw: {response.text[:100]}..."
