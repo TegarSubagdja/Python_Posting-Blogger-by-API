@@ -3,9 +3,12 @@ import pandas as pd
 from datetime import datetime
 from CodeGeminiResume import generate_and_upload_blog
 import time
+from dotenv import load_dotenv
+
+load_dotenv()
 
 gc = gspread.service_account(filename='credentials-spread.json')
-sh = gc.open_by_key("102jENB2-gOpjMN5Y52UMw7NeVXJAl5vkXDLcGWYc7kw")
+sh = gc.open_by_key(os.getenv("spread_sheet_key"))
 
 worksheet = sh.sheet1
 

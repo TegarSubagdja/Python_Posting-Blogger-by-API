@@ -1,0 +1,9 @@
+pip install google-api-python-client
+pip install google-auth
+pip install google-auth-oauthlib
+pip install google-auth-httplib2
+pip install python-dotenv
+pip install requests
+pip install google-generativeai
+pip install gspread
+pip install pandas

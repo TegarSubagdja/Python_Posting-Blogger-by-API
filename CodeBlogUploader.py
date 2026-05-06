@@ -3,8 +3,11 @@ import pickle
 from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
+from dotenv import load_dotenv
 
-BLOG_ID = '3613093306617339175' 
+load_dotenv()
+
+BLOG_ID = os.getenv("blog_id")
 SCOPES = ['https://www.googleapis.com/auth/blogger']
 
 def get_blogger_service():
