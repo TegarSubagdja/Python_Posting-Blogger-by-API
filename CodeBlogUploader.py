@@ -1,4 +1,5 @@
 import os
+import sys
 import pickle
 from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import InstalledAppFlow
@@ -12,8 +13,12 @@ SCOPES = ['https://www.googleapis.com/auth/blogger']
 
 def get_blogger_service():
     creds = None
-    if os.path.exists('token.pickle'):
-        with open('token.pickle', 'rb') as token:
+
+    token_path = 'token.pickle'
+    cred_path = 'credentials.json'
+
+    if os.path.exists(token_path):
+        with open(token_path, 'rb') as token:
             creds = pickle.load(token)
 
     if not creds or not creds.valid:
@@ -21,22 +26,26 @@ def get_blogger_service():
             creds.refresh(Request())
         else:
             flow = InstalledAppFlow.from_client_secrets_file(
-                'credentials.json', SCOPES)
+                cred_path, SCOPES)
             creds = flow.run_local_server(port=0)
-        
-        with open('token.pickle', 'wb') as token:
+
+        with open(token_path, 'wb') as token:
             pickle.dump(creds, token)
 
     return build('blogger', 'v3', credentials=creds)
 
-def buat_postingan(body):
+def uploadContentBlog(body):
     try:
         service = get_blogger_service()
         
-        request = service.posts().insert(blogId=BLOG_ID, body=body, isDraft=True)
+        request = service.posts().insert(
+            blogId=BLOG_ID,
+            body=body,
+            isDraft=True
+        )
         response = request.execute()
 
-        if response['published']:
+        if response.get('published'):
             return {"status": "success", "message": response}
         else:
             return {"status": "error", "message": response}

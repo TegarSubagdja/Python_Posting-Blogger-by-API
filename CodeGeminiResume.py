@@ -3,11 +3,10 @@ import os
 import requests
 from dotenv import load_dotenv
 from google import genai
-from CodeBlogUploader import buat_postingan
 
 load_dotenv()
 
-def generate_and_upload_blog(target_url="https://www.suryasarana.com/brands/thk"):
+def generateContentBlog(content, target_url):
     
     api_key = os.getenv("api_key")
     blog_id = os.getenv("blog_id")
@@ -17,21 +16,12 @@ def generate_and_upload_blog(target_url="https://www.suryasarana.com/brands/thk"
 
     client = genai.Client(api_key=api_key)
 
-    try:
-        response = requests.get(target_url, timeout=10)
-        if response.status_code == 200:
-            content = response.text
-        else:
-            content = target_url
-    except Exception as e:
-        content = target_url
-
     prompt = f"""
     Tugas: Analisis konten dari URL: {target_url} dan buatlah artikel blog 
     SEO Friendly, original, dan terdengar manusiawi dengan proper attribution.
 
     INPUT:
-    - Content: {content}
+    - Content dari {target_url} adalah: {content}
 
     INSTRUKSI PENULISAN:
 
@@ -111,13 +101,8 @@ def generate_and_upload_blog(target_url="https://www.suryasarana.com/brands/thk"
         )
 
         data = json.loads(response.text)
-        
-        hasil_upload = buat_postingan(data)
 
-        if hasil_upload["status"] == "success":
-            return {"status": "success", "data": data, "upload_response": hasil_upload}
-        else:
-            return {"status": "error", "data": data, "upload_response": hasil_upload}
+        return {"status": "success", "message": data}
 
     except json.JSONDecodeError as je:
         error_msg = f"Gagal parsing JSON. Raw: {response.text[:100]}..."
@@ -129,4 +114,7 @@ def generate_and_upload_blog(target_url="https://www.suryasarana.com/brands/thk"
         return {"status": "error", "message": error_msg}
 
 if __name__ == "__main__":
-    generate_and_upload_blog("https://www.suryasarana.com/brands/thk")
+    generateContentBlog(
+        "THK adalah pioner dari pada teknologi linea actuators. THK Co., Ltd. adalah perusahaan multinasional Jepang yang didirikan pada tahun 1971 dan dikenal luas sebagai inovator global terkemuka dalam teknologi Motion Control. Perusahaan ini adalah pionir dalam pengembangan dan produksi Teknologi Gerak Linear (Linear Motion Technology), yang menjadi tulang punggung bagi mesin dan sistem otomasi presisi di seluruh dunia. Dengan rekam jejak lebih dari 50 tahun, THK telah menetapkan standar industri untuk presisi, keandalan, dan inovasi dalam komponen mekanik.", 
+        "https://www.suryasarana.com/brands/thk"
+    )
