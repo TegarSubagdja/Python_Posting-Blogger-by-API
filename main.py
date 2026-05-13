@@ -1,20 +1,25 @@
 import os
 import re
 import time
+import json
 import gspread
 import requests
 import pandas as pd
-from datetime import datetime
+import datetime
 from dotenv import load_dotenv
 from bs4 import BeautifulSoup as bs
 from markdownify import markdownify as md
 from CodeGeminiResume import generateContentBlog
-from CodeBlogUploader import uploadContentBlog
+from CodeBlogUpload import uploadContentBlog
+from CodeGetStatitic import getSerankingPosition, calculateWeight
 
 load_dotenv()
 
 def getDataSpreadsheet():
     try:
+        gc = gspread.service_account(filename='credentials-spread.json')
+        sh = gc.open_by_key(os.getenv("spread_sheet_key"))
+        worksheet = sh.sheet1
         data = worksheet.get_all_records()
         df = pd.DataFrame(data)
         return df
@@ -46,45 +51,29 @@ def getContentUrl(url):
         print(f"Error getting content from URL: {e}")
         return ""
     
-gc = gspread.service_account(filename='credentials-spread.json')
-sh = gc.open_by_key(os.getenv("spread_sheet_key"))
-worksheet = sh.sheet1
-df = getDataSpreadsheet()
+# Block Step by Step
+with open ('Z_State.json', 'r') as f:
+    state = json.load(f)
 
-for i in df.index:
-    if not df.at[i, 'Status Blog'] == 'Success':
+lastUpdate = datetime.datetime.strptime(state['last_update'], '%Y-%m-%d').date()
 
-        url = df.at[i, 'Link']
-        print(f"Memulai penarikan data dari URL {url}")
-        content = getContentUrl(url)
-        print(f"Data berhasil ditarik dari URL {url}")
-        
-        print(f"Memulai pembuatan konten blog")
-        generateStatus = generateContentBlog(content, url)
-        print(f"Konten blog berhasil dibuat")
-        
-        print(f"Memulai upload konten blog")
-        uploadStatus = uploadContentBlog(generateStatus['message'])
-        print(f"Konten blog berhasil diupload")
+if datetime.date.today() <= lastUpdate:
+    print("Belum waktunya untuk update.")
+    print("Menghentikan program!")
+    exit()
 
-        if uploadStatus['status'] == 'success':
-            df.at[i, 'Status Blog'] = 'Success'
-            df.at[i, 'Date'] = datetime.now().strftime('%d-%m-%Y %H:%M:%S')
-            print("success")
-        else:
-            df.at[i, 'Status Blog'] = 'Error'
-            df.at[i, 'Date'] = datetime.now().strftime('%d-%m-%Y %H:%M:%S')
-            print("error")
-            
-    time.sleep(3)
+position = getSerankingPosition().json()[0]
 
-statusUpdate = updateDataSpreadsheet(df)
+listKeyword = []
+for k in position['keywords']:
+    weight = [n['pos'] - n['change'] for n in k['positions']]
+    listKeyword.append([k['name'], sum(weight)])
 
-while True:
-    pilihan = input("\nKeluar program? (y/n): ").strip().lower()
-    if pilihan == 'y':
-        break
-    elif pilihan == 'n':
-        print("Program tetap berjalan...")
-    else:
-        print("Input tidak valid. Ketik y atau n.")
+listKeyword.sort(key=lambda x: x[1])
+for l in listKeyword:
+    print(l)
+
+print(len(listKeyword))
+
+
+    

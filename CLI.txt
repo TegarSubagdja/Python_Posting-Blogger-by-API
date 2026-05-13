@@ -1,7 +1,0 @@
-pyinstaller --onefile ^
---exclude-module torchvision ^
---exclude-module torch ^
---add-data ".env;." ^
---add-data "credentials.json;." ^
---add-data "credentials-spread.json;." ^
-main.py
